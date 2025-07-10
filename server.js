@@ -10,8 +10,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const jobRoutes = require('./routers/Job'); 
 // Route prefix
 app.use('/home', homeRoutes);
+app.use('/job', jobRoutes);
 app.use('/uploads', express.static('uploads'));
 
 const path = require("path");
