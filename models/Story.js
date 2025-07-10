@@ -1,9 +1,11 @@
-// models/Story.js
 const mongoose = require("mongoose");
 
 const storySchema = new mongoose.Schema({
-  icon: String, 
-  description: String,
+  description: {
+    uz: String,
+    ru: String,
+    en: String
+  },
   year: String
 });
 

@@ -1,9 +1,16 @@
-// models/Location.js
 const mongoose = require("mongoose");
 
 const locationSchema = new mongoose.Schema({
-  title: String,
-  description: String,
+  title: {
+    uz: String,
+    ru: String,
+    en: String
+  },
+  description: {
+    uz: String,
+    ru: String,
+    en: String
+  },
   mapEmbedUrl: String
 });
 
