@@ -15,6 +15,8 @@ const jobRoutes = require('./routers/Job');
 app.use('/home', homeRoutes);
 app.use('/job', jobRoutes);
 app.use('/uploads', express.static('uploads'));
+const authRoutes = require('./routers/Auth');
+app.use('/auth', authRoutes);
 
 const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

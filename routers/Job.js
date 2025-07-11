@@ -101,12 +101,12 @@ const jobs = [
   // boshqa ishlar ham shu yerga qo‘shiladi
 ];
 
-// 👉 GET /job - barcha ishlar
-router.get('/', (req, res) => {
+const verifyToken = require('../middleware/AuthMiddleware');
+
+router.get('/', verifyToken, (req, res) => {
   res.json(jobs);
 });
 
-// 👉 GET /job/:slug - bitta ishni slug orqali
 router.get('/:slug', (req, res) => {
   const { slug } = req.params;
   const job = jobs.find(j => j.slug === slug);
