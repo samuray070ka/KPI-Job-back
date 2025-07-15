@@ -199,23 +199,40 @@ router.post('/values', async (req, res) => {
 
 
 
+// routes/jobRoutes.js (yoki homeRoutes.js) ichida
 router.post('/jobs', async (req, res) => {
-  const newJob = new Jobs({
-    department: req.body.department,
-    title: req.body.title,
-    type: req.body.type,
-    location: req.body.location
-    // ❌ slug yozish shart emas, modelda auto
-  });
-
   try {
+    const {
+      department,
+      title,
+      type,
+      location,
+      description    // 👈 3 tilda kelishi yoki bitta string bo‘lishi mumkin
+    } = req.body;
+
+    // description ni har doim obyektga aylantiramiz
+    const formattedDescription = {
+      uz: description?.uz || description || 'Tavsif mavjud emas',
+      ru: description?.ru || description || 'Описание недоступно',
+      en: description?.en || description || 'Description not available'
+    };
+
+    const newJob = new Jobs({
+      department,
+      title,
+      type,
+      location,
+      description: formattedDescription
+      // slug avtomatik yaratilyapti modelda
+    });
+
     const saved = await newJob.save();
     res.status(201).json(saved);
   } catch (err) {
+    console.error('POST /jobs error:', err.message);
     res.status(400).json({ message: err.message });
   }
 });
-
 
 // ========== PERK: max 10 ta ==========
 router.post('/perks', async (req, res) => {
