@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
-
+const MultiLangString = new mongoose.Schema({
+  uz: { type: String, required: true },
+  ru: { type: String, required: true },
+  en: { type: String, required: true },
+}, { _id: false });
 const jobSchema = new mongoose.Schema({
   department: {
     type: String,
@@ -23,7 +27,8 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true
-  }
+  },
+  description: { type: MultiLangString, required: false },
 }, {
   timestamps: true
 });

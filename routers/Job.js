@@ -1,121 +1,59 @@
 const express = require('express');
 const router = express.Router();
+const Job = require('../models/Job');
 
-const jobs = [
- {
-    slug: "full-stack-developer",
-    title: {
-      uz: "Call Center Qo'llab-quvvatlash Jamoasi Raxbari",
-      ru: "Руководитель команды поддержки call-центра",
-      en: "Call Center Support Team Lead"
-    },
-    location: "Hybrid",
-    type: "Barcelona, Catalunya [Cataluña], Spain",
-    description: {
-      uz: `
-        <h2>Jamoaga qo‘shiling. Ta’sir qiling.</h2>
-        <p><strong>Holded</strong> kompaniyasida biz ishonamizki, kunlik ma’muriy ishlar hech qachon katta g‘oyaning muvaffaqiyatga erishishiga to‘sqinlik qilmasligi kerak. Shuning uchun biz har bir jasoratli ish boshlovchi uchun intuitiv dasturlar yaratamiz.</p>
-        
-        <h3>Vazifalar:</h3>
-        <ul>
-          <li>Call Center qo‘llab-quvvatlash guruhini boshqarish</li>
-          <li>Kunlik jarayonlarni kuzatib borish</li>
-          <li>Yangi funksiyalar haqida xodimlarni xabardor qilish</li>
-          <li>Mijoz muammolarini hal qilish</li>
-        </ul>
-      `,
-      ru: `
-        <h2>Присоединяйтесь к команде. Внесите свой вклад.</h2>
-        <p><strong>В Holded</strong> мы уверены, что рутинные задачи не должны мешать хорошей идее достичь успеха.</p>
-        
-        <h3>Обязанности:</h3>
-        <ul>
-          <li>Управление командой поддержки call-центра</li>
-          <li>Контроль ежедневных операций</li>
-          <li>Информирование команды о новых функциях</li>
-          <li>Решение проблем клиентов</li>
-        </ul>
-      `,
-      en: `
-        <h2>Job description</h2>
-        <p>At <strong>Holded</strong>, we believe daily admin should never stop a great idea from becoming a success.</p>
-        
-        <h3>Responsibilities:</h3>
-        <ul>
-          <li>Lead the Call Center Support team</li>
-          <li>Monitor daily operations</li>
-          <li>Keep the team informed about new features</li>
-          <li>Resolve customer issues</li>
-        </ul>
-      `
-    }
-  },
-  {
-    slug: "backend-senior",
-    title: {
-      uz: "Call Center Qo'llab-quvvatlash Jamoasi Raxbari",
-      ru: "Руководитель команды поддержки call-центра",
-      en: "Call Center Support Team Lead"
-    },
-    location: "Barcelona",
-    type: "Full-time",
-    description: {
-      uz: `
-        <h2>Jamoaga qo‘shiling. Ta’sir qiling.</h2>
-        <p><strong>Holded</strong> kompaniyasida biz ishonamizki, kunlik ma’muriy ishlar hech qachon katta g‘oyaning muvaffaqiyatga erishishiga to‘sqinlik qilmasligi kerak. Shuning uchun biz har bir jasoratli ish boshlovchi uchun intuitiv dasturlar yaratamiz.</p>
-        
-        <h3>Vazifalar:</h3>
-        <ul>
-          <li>Call Center qo‘llab-quvvatlash guruhini boshqarish</li>
-          <li>Kunlik jarayonlarni kuzatib borish</li>
-          <li>Yangi funksiyalar haqida xodimlarni xabardor qilish</li>
-          <li>Mijoz muammolarini hal qilish</li>
-        </ul>
-      `,
-      ru: `
-        <h2>Присоединяйтесь к команде. Внесите свой вклад.</h2>
-        <p><strong>В Holded</strong> мы уверены, что рутинные задачи не должны мешать хорошей идее достичь успеха.</p>
-        
-        <h3>Обязанности:</h3>
-        <ul>
-          <li>Управление командой поддержки call-центра</li>
-          <li>Контроль ежедневных операций</li>
-          <li>Информирование команды о новых функциях</li>
-          <li>Решение проблем клиентов</li>
-        </ul>
-      `,
-      en: `
-        <h2>Join the team. Make an impact.</h2>
-        <p>At <strong>Holded</strong>, we believe daily admin should never stop a great idea from becoming a success.</p>
-        
-        <h3>Responsibilities:</h3>
-        <ul>
-          <li>Lead the Call Center Support team</li>
-          <li>Monitor daily operations</li>
-          <li>Keep the team informed about new features</li>
-          <li>Resolve customer issues</li>
-        </ul>
-      `
-    }
-  },
-  // boshqa ishlar ham shu yerga qo‘shiladi
-];
-
-const verifyToken = require('../middleware/AuthMiddleware');
-
-router.get('/', verifyToken, (req, res) => {
-  res.json(jobs);
+// GET all jobs
+router.get('/', async (req, res) => {
+  try {
+    const jobs = await Job.find();
+    res.json(jobs);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-router.get('/:slug', (req, res) => {
-  const { slug } = req.params;
-  const job = jobs.find(j => j.slug === slug);
-
-  if (!job) {
-    return res.status(404).json({ message: "Job not found" });
+// GET job by slug
+router.get('/:slug', async (req, res) => {
+  try {
+    const job = await Job.findOne({ slug: req.params.slug });
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
+});
 
-  res.json(job);
+// POST create new job
+router.post('/', async (req, res) => {
+  try {
+    const newJob = new Job(req.body);
+    await newJob.save();
+    res.status(201).json(newJob);
+  } catch (err) {
+    res.status(400).json({ message: 'Validation error', error: err.message });
+  }
+});
+
+// PUT update job by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Job not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: 'Update error', error: err.message });
+  }
+});
+
+// DELETE job by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Job.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Job not found' });
+    res.json({ message: 'Job deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;
