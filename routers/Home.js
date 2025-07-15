@@ -205,7 +205,9 @@ router.post('/jobs', async (req, res) => {
     title: req.body.title,
     type: req.body.type,
     location: req.body.location
+    // ❌ slug yozish shart emas, modelda auto
   });
+
   try {
     const saved = await newJob.save();
     res.status(201).json(saved);
@@ -213,6 +215,7 @@ router.post('/jobs', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // ========== PERK: max 10 ta ==========
 router.post('/perks', async (req, res) => {

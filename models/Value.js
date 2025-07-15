@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const valueSchema = new mongoose.Schema({
-  icon: String,
+  icon: { type: String, required: true }, // <-- MUHIM
   title: {
     uz: String,
     ru: String,
